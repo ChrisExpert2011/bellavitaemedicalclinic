@@ -1,0 +1,266 @@
+import { createFileRoute } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { toast } from "sonner";
+import { SiteLayout } from "@/components/SiteLayout";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { INSURANCES, TIME_SLOTS } from "@/lib/clinic";
+
+export const Route = createFileRoute("/appointments")({
+  head: () => ({
+    meta: [
+      { title: "Book an appointment | Bella Vitae Medical Clinic" },
+      {
+        name: "description",
+        content:
+          "Book an online appointment at Bella Vitae Medical Clinic in Kigali. Choose your doctor, date and time and receive a unique appointment code.",
+      },
+      { property: "og:title", content: "Book an appointment | Bella Vitae Medical Clinic" },
+      {
+        property: "og:description",
+        content: "Pick your doctor, date and hour and get an instant appointment code.",
+      },
+    ],
+  }),
+  component: AppointmentsPage,
+});
+
+function AppointmentsPage() {
+  const { user } = useAuth();
+  const [form, setForm] = useState({
+    patient_name: "",
+    phone: "",
+    insurance: INSURANCES[0] as string,
+    insurance_card: "",
+    doctor: "",
+    requested_date: "",
+    requested_time: TIME_SLOTS[0] ?? "07:00",
+    reason: "",
+  });
+  const [code, setCode] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [lookup, setLookup] = useState("");
+  const [found, setFound] = useState<Record<string, unknown> | null>(null);
+
+  const { data: doctors } = useQuery({
+    queryKey: ["staff_members"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("staff_members").select("*").order("sort_order");
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const set = (k: string, v: string) => setForm((f) => ({ ...f, [k]: v }));
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (form.patient_name.trim().length < 2) {
+      toast.error("Please enter the patient name");
+      return;
+    }
+    if (form.phone.trim().length < 8) {
+      toast.error("Please enter a valid phone number");
+      return;
+    }
+    if (!form.doctor) {
+      toast.error("Please choose a doctor");
+      return;
+    }
+    setBusy(true);
+    try {
+      const { data, error } = await supabase.rpc("book_appointment", {
+        _patient_name: form.patient_name.trim(),
+        _phone: form.phone.trim(),
+        _insurance: form.insurance,
+        _insurance_card: form.insurance_card.trim(),
+        _doctor: form.doctor,
+        _requested_date: form.requested_date,
+        _requested_time: form.requested_time,
+        _reason: form.reason.trim(),
+      });
+      if (error) throw error;
+      setCode(data as string);
+      toast.success("Appointment requested!");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not book the appointment");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const search = async () => {
+    const { data } = await supabase
+      .from("appointments")
+      .select("*")
+      .eq("code", lookup.trim().toUpperCase())
+      .maybeSingle();
+    if (!data) toast.error("No appointment found for this code (sign in to view your bookings)");
+    setFound(data as Record<string, unknown> | null);
+  };
+
+  return (
+    <SiteLayout>
+      <div className="mx-auto max-w-4xl px-4 py-12">
+        <h1 className="text-3xl font-bold text-primary">Online appointment booking</h1>
+        <p className="mt-2 text-muted-foreground">
+          Fill in the patient details, choose the doctor and the hour you want, and you will get a
+          unique appointment code.
+        </p>
+
+        {code ? (
+          <div className="mt-8 rounded-2xl border-2 border-accent bg-accent/10 p-6 text-center">
+            <p className="text-sm uppercase tracking-widest text-muted-foreground">
+              Your appointment code
+            </p>
+            <p className="mt-2 text-4xl font-bold tracking-widest text-primary">{code}</p>
+            <p className="mt-3 text-sm text-muted-foreground">
+              Keep this code. Present it at the reception on{" "}
+              <strong>
+                {form.requested_date} at {form.requested_time}
+              </strong>{" "}
+              with <strong>{form.doctor}</strong>.
+            </p>
+            <button
+              onClick={() => setCode(null)}
+              className="mt-4 rounded-md border border-border px-4 py-2 text-sm"
+            >
+              Book another appointment
+            </button>
+          </div>
+        ) : (
+          <form
+            onSubmit={submit}
+            className="mt-8 grid gap-4 rounded-2xl border border-border bg-card p-6 shadow-sm sm:grid-cols-2"
+          >
+            <Field label="Patient full name" value={form.patient_name} onChange={(v) => set("patient_name", v)} required />
+            <Field label="Phone number" value={form.phone} onChange={(v) => set("phone", v)} required />
+            <label className="block text-sm">
+              <span className="mb-1 block font-medium">Insurance</span>
+              <select
+                value={form.insurance}
+                onChange={(e) => set("insurance", e.target.value)}
+                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+              >
+                {INSURANCES.map((i) => (
+                  <option key={i}>{i}</option>
+                ))}
+              </select>
+            </label>
+            <Field
+              label="Insurance card number"
+              value={form.insurance_card}
+              onChange={(v) => set("insurance_card", v)}
+            />
+            <label className="block text-sm">
+              <span className="mb-1 block font-medium">Doctor</span>
+              <select
+                value={form.doctor}
+                onChange={(e) => set("doctor", e.target.value)}
+                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+              >
+                <option value="">Choose a doctor…</option>
+                {(doctors ?? []).map((d) => (
+                  <option key={d.id} value={`${d.full_name} (${d.specialty})`}>
+                    {d.full_name} — {d.specialty}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="block text-sm">
+              <span className="mb-1 block font-medium">Hour</span>
+              <select
+                value={form.requested_time}
+                onChange={(e) => set("requested_time", e.target.value)}
+                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+              >
+                {TIME_SLOTS.map((t) => (
+                  <option key={t}>{t}</option>
+                ))}
+              </select>
+            </label>
+            <Field
+              label="Date"
+              type="date"
+              value={form.requested_date}
+              onChange={(v) => set("requested_date", v)}
+              required
+            />
+            <label className="block text-sm sm:col-span-2">
+              <span className="mb-1 block font-medium">Reason for the visit (optional)</span>
+              <textarea
+                value={form.reason}
+                maxLength={500}
+                onChange={(e) => set("reason", e.target.value)}
+                className="min-h-24 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+              />
+            </label>
+            <button
+              type="submit"
+              disabled={busy}
+              className="sm:col-span-2 rounded-md bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground disabled:opacity-60"
+            >
+              {busy ? "Booking…" : "Get my appointment code"}
+            </button>
+          </form>
+        )}
+
+        <div className="mt-10 rounded-2xl border border-border bg-card p-6">
+          <h2 className="text-lg font-semibold">Check an appointment</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Signed-in patients and staff can look up an appointment by its code.
+          </p>
+          <div className="mt-3 flex gap-2">
+            <input
+              value={lookup}
+              onChange={(e) => setLookup(e.target.value)}
+              placeholder="BV-XXXXXX"
+              className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm"
+            />
+            <button onClick={search} className="rounded-md bg-secondary px-4 py-2 text-sm font-medium">
+              Search
+            </button>
+          </div>
+          {found ? (
+            <div className="mt-4 rounded-lg bg-secondary/60 p-4 text-sm">
+              <p><strong>{String(found['patient_name'])}</strong> — {String(found['doctor'])}</p>
+              <p>
+                {String(found['requested_date'])} at {String(found['requested_time'])} · status:{" "}
+                {String(found['status'])}
+              </p>
+            </div>
+          ) : null}
+        </div>
+      </div>
+    </SiteLayout>
+  );
+}
+
+function Field({
+  label,
+  value,
+  onChange,
+  type = "text",
+  required,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  type?: string;
+  required?: boolean;
+}) {
+  return (
+    <label className="block text-sm">
+      <span className="mb-1 block font-medium">{label}</span>
+      <input
+        type={type}
+        value={value}
+        required={required}
+        maxLength={120}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
+      />
+    </label>
+  );
+}
