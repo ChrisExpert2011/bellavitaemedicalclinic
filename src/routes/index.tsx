@@ -23,10 +23,10 @@ export const Route = createFileRoute("/")({
         content:
           "Bella Vitae Medical Clinic on KN 5 Rd, Kigali. General medicine, dentistry, gynecology, internal medicine. Open daily 07:00–23:00. Book online.",
       },
-      { property: "og:title", content: "Bella Vitae Medical Clinic | Kigali" },
+      { property: "og:title", content: "Bella Vitae Medical Clinic | Kigali, open 07:00–23:00" },
       {
         property: "og:description",
-        content: "Caring medical services in Kigali, open every day from 07:00 to 23:00.",
+        content: "Bella Vitae Medical Clinic on KN 5 Rd, Kigali. General medicine, dentistry, gynecology, internal medicine. Open daily 07:00–23:00. Book online.",
       },
     ],
   }),
