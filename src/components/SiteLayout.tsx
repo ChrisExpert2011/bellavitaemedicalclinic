@@ -8,6 +8,7 @@ import { CLINIC_ADDRESS, CLINIC_NAME } from "@/lib/clinic";
 const navLinks = [
   { to: "/", label: "Home" },
   { to: "/appointments", label: "Appointments" },
+  { to: "/my-appointments", label: "My appointments" },
   { to: "/news", label: "News" },
   { to: "/community", label: "Community" },
 ];

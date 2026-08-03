@@ -251,6 +251,24 @@ export type Database = {
         }
         Returns: string
       }
+      cancel_appointment_by_phone: {
+        Args: { _code: string; _phone: string }
+        Returns: boolean
+      }
+      get_appointments_by_phone: {
+        Args: { _phone: string }
+        Returns: {
+          code: string
+          created_at: string
+          doctor: string
+          insurance: string
+          patient_name: string
+          reason: string
+          requested_date: string
+          requested_time: string
+          status: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

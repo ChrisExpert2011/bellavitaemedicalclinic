@@ -15,6 +15,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AppointmentsRouteImport } from './routes/appointments'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CommunityRouteImport } from './routes/community'
+import { Route as MyAppointmentsRouteImport } from './routes/my-appointments'
 import { Route as NewsRouteImport } from './routes/news'
 
 const IndexRoute = IndexRouteImport.update({
@@ -47,6 +48,11 @@ const CommunityRoute = CommunityRouteImport.update({
   path: '/community',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MyAppointmentsRoute = MyAppointmentsRouteImport.update({
+  id: '/my-appointments',
+  path: '/my-appointments',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const NewsRoute = NewsRouteImport.update({
   id: '/news',
   path: '/news',
@@ -60,6 +66,7 @@ export interface FileRoutesByFullPath {
   '/appointments': typeof AppointmentsRoute
   '/auth': typeof AuthRoute
   '/community': typeof CommunityRoute
+  '/my-appointments': typeof MyAppointmentsRoute
   '/news': typeof NewsRoute
 }
 export interface FileRoutesByTo {
@@ -69,6 +76,7 @@ export interface FileRoutesByTo {
   '/appointments': typeof AppointmentsRoute
   '/auth': typeof AuthRoute
   '/community': typeof CommunityRoute
+  '/my-appointments': typeof MyAppointmentsRoute
   '/news': typeof NewsRoute
 }
 export interface FileRoutesById {
@@ -79,6 +87,7 @@ export interface FileRoutesById {
   '/appointments': typeof AppointmentsRoute
   '/auth': typeof AuthRoute
   '/community': typeof CommunityRoute
+  '/my-appointments': typeof MyAppointmentsRoute
   '/news': typeof NewsRoute
 }
 export interface FileRouteTypes {
@@ -90,6 +99,7 @@ export interface FileRouteTypes {
     | '/appointments'
     | '/auth'
     | '/community'
+    | '/my-appointments'
     | '/news'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -99,6 +109,7 @@ export interface FileRouteTypes {
     | '/appointments'
     | '/auth'
     | '/community'
+    | '/my-appointments'
     | '/news'
   id:
     | '__root__'
@@ -108,6 +119,7 @@ export interface FileRouteTypes {
     | '/appointments'
     | '/auth'
     | '/community'
+    | '/my-appointments'
     | '/news'
   fileRoutesById: FileRoutesById
 }
@@ -118,6 +130,7 @@ export interface RootRouteChildren {
   AppointmentsRoute: typeof AppointmentsRoute
   AuthRoute: typeof AuthRoute
   CommunityRoute: typeof CommunityRoute
+  MyAppointmentsRoute: typeof MyAppointmentsRoute
   NewsRoute: typeof NewsRoute
 }
 
@@ -165,6 +178,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CommunityRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/my-appointments': {
+      id: '/my-appointments'
+      path: '/my-appointments'
+      fullPath: '/my-appointments'
+      preLoaderRoute: typeof MyAppointmentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/news': {
       id: '/news'
       path: '/news'
@@ -182,6 +202,7 @@ const rootRouteChildren: RootRouteChildren = {
   AppointmentsRoute: AppointmentsRoute,
   AuthRoute: AuthRoute,
   CommunityRoute: CommunityRoute,
+  MyAppointmentsRoute: MyAppointmentsRoute,
   NewsRoute: NewsRoute,
 }
 export const routeTree = rootRouteImport
