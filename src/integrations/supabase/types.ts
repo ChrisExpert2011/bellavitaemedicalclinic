@@ -14,8 +14,57 @@ export type Database = {
   }
   public: {
     Tables: {
+      appointment_reminders: {
+        Row: {
+          appointment_id: string
+          created_at: string
+          error: string | null
+          id: string
+          kind: string
+          message: string
+          phone: string
+          sent_at: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          appointment_id: string
+          created_at?: string
+          error?: string | null
+          id?: string
+          kind: string
+          message: string
+          phone: string
+          sent_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          appointment_id?: string
+          created_at?: string
+          error?: string | null
+          id?: string
+          kind?: string
+          message?: string
+          phone?: string
+          sent_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointment_reminders_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       appointments: {
         Row: {
+          cancellation_reason: string | null
+          cancelled_at: string | null
           code: string | null
           created_at: string
           doctor: string
@@ -24,14 +73,19 @@ export type Database = {
           insurance_card: string | null
           patient_name: string
           phone: string
+          previous_date: string | null
+          previous_time: string | null
           reason: string | null
           requested_date: string
           requested_time: string
+          rescheduled_at: string | null
           status: string
           updated_at: string
           user_id: string | null
         }
         Insert: {
+          cancellation_reason?: string | null
+          cancelled_at?: string | null
           code?: string | null
           created_at?: string
           doctor: string
@@ -40,14 +94,19 @@ export type Database = {
           insurance_card?: string | null
           patient_name: string
           phone: string
+          previous_date?: string | null
+          previous_time?: string | null
           reason?: string | null
           requested_date: string
           requested_time: string
+          rescheduled_at?: string | null
           status?: string
           updated_at?: string
           user_id?: string | null
         }
         Update: {
+          cancellation_reason?: string | null
+          cancelled_at?: string | null
           code?: string | null
           created_at?: string
           doctor?: string
@@ -56,9 +115,12 @@ export type Database = {
           insurance_card?: string | null
           patient_name?: string
           phone?: string
+          previous_date?: string | null
+          previous_time?: string | null
           reason?: string | null
           requested_date?: string
           requested_time?: string
+          rescheduled_at?: string | null
           status?: string
           updated_at?: string
           user_id?: string | null
@@ -116,6 +178,45 @@ export type Database = {
           created_at?: string
           id?: string
           message?: string
+        }
+        Relationships: []
+      }
+      phone_otps: {
+        Row: {
+          attempts: number
+          code: string
+          created_at: string
+          expires_at: string
+          id: string
+          phone_digits: string
+          token: string | null
+          token_expires_at: string | null
+          updated_at: string
+          verified_at: string | null
+        }
+        Insert: {
+          attempts?: number
+          code: string
+          created_at?: string
+          expires_at: string
+          id?: string
+          phone_digits: string
+          token?: string | null
+          token_expires_at?: string | null
+          updated_at?: string
+          verified_at?: string | null
+        }
+        Update: {
+          attempts?: number
+          code?: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          phone_digits?: string
+          token?: string | null
+          token_expires_at?: string | null
+          updated_at?: string
+          verified_at?: string | null
         }
         Relationships: []
       }
@@ -251,21 +352,41 @@ export type Database = {
         }
         Returns: string
       }
-      cancel_appointment_by_phone: {
-        Args: { _code: string; _phone: string }
+      cancel_appointment_by_token: {
+        Args: { _code: string; _reason?: string; _token: string }
         Returns: boolean
       }
-      get_appointments_by_phone: {
-        Args: { _phone: string }
+      due_appointment_reminders: {
+        Args: never
         Returns: {
+          appointment_id: string
+          code: string
+          doctor: string
+          kind: string
+          patient_name: string
+          phone: string
+          requested_date: string
+          requested_time: string
+        }[]
+      }
+      get_appointments_by_token: {
+        Args: { _token: string }
+        Returns: {
+          cancellation_reason: string
+          cancelled_at: string
           code: string
           created_at: string
           doctor: string
           insurance: string
+          insurance_card: string
           patient_name: string
+          phone: string
+          previous_date: string
+          previous_time: string
           reason: string
           requested_date: string
           requested_time: string
+          rescheduled_at: string
           status: string
         }[]
       }
@@ -275,6 +396,25 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      phone_for_token: { Args: { _token: string }; Returns: string }
+      request_phone_otp: {
+        Args: { _phone: string }
+        Returns: {
+          code: string
+          expires_at: string
+        }[]
+      }
+      reschedule_appointment_by_token: {
+        Args: { _code: string; _date: string; _time: string; _token: string }
+        Returns: boolean
+      }
+      verify_phone_otp: {
+        Args: { _code: string; _phone: string }
+        Returns: {
+          expires_at: string
+          token: string
+        }[]
       }
     }
     Enums: {
