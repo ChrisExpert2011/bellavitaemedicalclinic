@@ -7,6 +7,7 @@ import { SiteLayout } from "@/components/SiteLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { createWorker } from "@/lib/admin.functions";
+import { listWorkers, deleteWorker } from "@/lib/staff.functions";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -23,7 +24,7 @@ export const Route = createFileRoute("/admin")({
   component: AdminPage,
 });
 
-const TABS = ["Appointments", "Contacts", "Workers", "News", "Team"] as const;
+const TABS = ["Appointments", "Messages", "Contacts", "Workers", "News", "Team"] as const;
 type Tab = (typeof TABS)[number];
 
 function AdminPage() {
@@ -54,7 +55,7 @@ function AdminPage() {
     );
   }
 
-  const visibleTabs = isAdmin ? TABS : (["Appointments", "News"] as const);
+  const visibleTabs = isAdmin ? TABS : (["Appointments", "Messages", "News"] as const);
 
   return (
     <SiteLayout>
@@ -75,6 +76,7 @@ function AdminPage() {
         </div>
         <div className="py-8">
           {tab === "Appointments" ? <AppointmentsTab /> : null}
+          {tab === "Messages" ? <MessagesTab isAdmin={isAdmin} /> : null}
           {tab === "Contacts" && isAdmin ? <ContactsTab /> : null}
           {tab === "Workers" && isAdmin ? <WorkersTab /> : null}
           {tab === "News" ? <NewsTab /> : null}
