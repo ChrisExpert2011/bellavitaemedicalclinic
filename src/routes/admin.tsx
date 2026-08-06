@@ -289,6 +289,9 @@ function ContactCard({
 
 function WorkersTab() {
   const register = useServerFn(createWorker);
+  const fetchWorkers = useServerFn(listWorkers);
+  const removeWorker = useServerFn(deleteWorker);
+  const qc = useQueryClient();
   const [form, setForm] = useState({
     fullName: "",
     email: "",
@@ -299,6 +302,23 @@ function WorkersTab() {
   const [busy, setBusy] = useState(false);
   const set = (k: string, v: string) => setForm((f) => ({ ...f, [k]: v }));
 
+  const { data: workers } = useQuery({
+    queryKey: ["admin_workers"],
+    queryFn: async () => (await fetchWorkers({ data: undefined })).workers,
+  });
+
+  const onDelete = async (id: string, name: string) => {
+    if (!window.confirm(`Delete the account of ${name}? This cannot be undone.`)) return;
+    try {
+      await removeWorker({ data: { userId: id } });
+      toast.success("Worker deleted");
+      qc.invalidateQueries({ queryKey: ["admin_workers"] });
+      qc.invalidateQueries({ queryKey: ["staff_members"] });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not delete the worker");
+    }
+  };
+
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setBusy(true);
@@ -306,6 +326,8 @@ function WorkersTab() {
       await register({ data: { ...form, addToTeam: true } });
       toast.success(`Worker account created for ${form.email}`);
       setForm({ fullName: "", email: "", password: "", phone: "", specialty: "" });
+      qc.invalidateQueries({ queryKey: ["admin_workers"] });
+      qc.invalidateQueries({ queryKey: ["staff_members"] });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Could not create the worker");
     } finally {
@@ -314,7 +336,8 @@ function WorkersTab() {
   };
 
   return (
-    <div className="max-w-xl">
+    <div className="grid gap-6 lg:grid-cols-2">
+      <div>
       <h2 className="text-lg font-semibold">Register a worker</h2>
       <p className="mt-1 text-sm text-muted-foreground">
         Create login credentials for a staff member. They can change their name, phone and password
@@ -340,6 +363,45 @@ function WorkersTab() {
           {busy ? "Creating…" : "Create worker account"}
         </button>
       </form>
+      </div>
+      <div>
+        <h2 className="text-lg font-semibold">Registered workers</h2>
+        <div className="mt-4 overflow-x-auto rounded-xl border border-border bg-card">
+          <table className="w-full text-sm">
+            <thead className="bg-secondary/60 text-left">
+              <tr>
+                {["Name", "Specialty", "Phone", "Email", "Role", ""].map((h) => (
+                  <th key={h} className="px-3 py-2 font-medium">{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {(workers ?? []).map((w) => (
+                <tr key={w.id} className="border-t border-border">
+                  <td className="px-3 py-2">{w.fullName || "—"}</td>
+                  <td className="px-3 py-2">{w.specialty || "—"}</td>
+                  <td className="px-3 py-2">{w.phone || "—"}</td>
+                  <td className="px-3 py-2">{w.email}</td>
+                  <td className="px-3 py-2">{w.role}</td>
+                  <td className="px-3 py-2">
+                    {w.role === "admin" ? null : (
+                      <button
+                        onClick={() => onDelete(w.id, w.fullName || w.email)}
+                        className="text-xs text-destructive hover:underline"
+                      >
+                        Delete
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {(workers ?? []).length === 0 ? (
+            <p className="p-4 text-sm text-muted-foreground">No workers registered yet.</p>
+          ) : null}
+        </div>
+      </div>
     </div>
   );
 }
