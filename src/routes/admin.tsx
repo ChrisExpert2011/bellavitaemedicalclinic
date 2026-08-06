@@ -182,6 +182,85 @@ function ContactsTab() {
   );
 }
 
+function MessagesTab({ isAdmin }: { isAdmin: boolean }) {
+  const qc = useQueryClient();
+  const { data } = useQuery({
+    queryKey: ["admin_messages"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("contact_messages")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const markRead = async (id: string) => {
+    const { error } = await supabase
+      .from("contact_messages")
+      .update({ status: "read", read_at: new Date().toISOString() })
+      .eq("id", id);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    qc.invalidateQueries({ queryKey: ["admin_messages"] });
+  };
+
+  const remove = async (id: string) => {
+    const { error } = await supabase.from("contact_messages").delete().eq("id", id);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    qc.invalidateQueries({ queryKey: ["admin_messages"] });
+  };
+
+  return (
+    <div className="space-y-3">
+      <p className="text-sm text-muted-foreground">
+        Messages sent from the “Contact us” form arrive here — nothing is sent by email.
+      </p>
+      {(data ?? []).map((m) => (
+        <div key={m.id} className="rounded-xl border border-border bg-card p-4">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <p className="font-semibold">{m.subject}</p>
+            <span
+              className={`rounded-full px-2 py-0.5 text-xs ${
+                m.status === "new" ? "bg-accent/20 text-accent-foreground" : "bg-secondary"
+              }`}
+            >
+              {m.status}
+            </span>
+          </div>
+          <p className="mt-1 text-sm text-muted-foreground">
+            From {m.sender_name}
+            {m.sender_phone ? ` · ${m.sender_phone}` : ""}
+            {m.sender_email ? ` · ${m.sender_email}` : ""} · to {m.to_label ?? "Reception"}
+          </p>
+          <p className="mt-2 whitespace-pre-wrap text-sm">{m.message}</p>
+          <div className="mt-2 flex gap-4">
+            {m.status === "new" ? (
+              <button onClick={() => markRead(m.id)} className="text-xs text-primary hover:underline">
+                Mark as read
+              </button>
+            ) : null}
+            {isAdmin ? (
+              <button onClick={() => remove(m.id)} className="text-xs text-destructive hover:underline">
+                Delete
+              </button>
+            ) : null}
+          </div>
+        </div>
+      ))}
+      {(data ?? []).length === 0 ? (
+        <p className="text-sm text-muted-foreground">No messages yet.</p>
+      ) : null}
+    </div>
+  );
+}
+
 function ContactCard({
   contact,
   onSave,
