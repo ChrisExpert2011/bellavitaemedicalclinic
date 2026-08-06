@@ -17,6 +17,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CommunityRouteImport } from './routes/community'
 import { Route as MyAppointmentsRouteImport } from './routes/my-appointments'
 import { Route as NewsRouteImport } from './routes/news'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ApiPublicSendRemindersRouteImport } from './routes/api/public/send-reminders'
 
 const IndexRoute = IndexRouteImport.update({
@@ -59,6 +60,11 @@ const NewsRoute = NewsRouteImport.update({
   path: '/news',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicSendRemindersRoute = ApiPublicSendRemindersRouteImport.update({
   id: '/api/public/send-reminders',
   path: '/api/public/send-reminders',
@@ -74,6 +80,7 @@ export interface FileRoutesByFullPath {
   '/community': typeof CommunityRoute
   '/my-appointments': typeof MyAppointmentsRoute
   '/news': typeof NewsRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/api/public/send-reminders': typeof ApiPublicSendRemindersRoute
 }
 export interface FileRoutesByTo {
@@ -85,6 +92,7 @@ export interface FileRoutesByTo {
   '/community': typeof CommunityRoute
   '/my-appointments': typeof MyAppointmentsRoute
   '/news': typeof NewsRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/api/public/send-reminders': typeof ApiPublicSendRemindersRoute
 }
 export interface FileRoutesById {
@@ -97,6 +105,7 @@ export interface FileRoutesById {
   '/community': typeof CommunityRoute
   '/my-appointments': typeof MyAppointmentsRoute
   '/news': typeof NewsRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/api/public/send-reminders': typeof ApiPublicSendRemindersRoute
 }
 export interface FileRouteTypes {
@@ -110,6 +119,7 @@ export interface FileRouteTypes {
     | '/community'
     | '/my-appointments'
     | '/news'
+    | '/sitemap.xml'
     | '/api/public/send-reminders'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -121,6 +131,7 @@ export interface FileRouteTypes {
     | '/community'
     | '/my-appointments'
     | '/news'
+    | '/sitemap.xml'
     | '/api/public/send-reminders'
   id:
     | '__root__'
@@ -132,6 +143,7 @@ export interface FileRouteTypes {
     | '/community'
     | '/my-appointments'
     | '/news'
+    | '/sitemap.xml'
     | '/api/public/send-reminders'
   fileRoutesById: FileRoutesById
 }
@@ -144,6 +156,7 @@ export interface RootRouteChildren {
   CommunityRoute: typeof CommunityRoute
   MyAppointmentsRoute: typeof MyAppointmentsRoute
   NewsRoute: typeof NewsRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   ApiPublicSendRemindersRoute: typeof ApiPublicSendRemindersRoute
 }
 
@@ -205,6 +218,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NewsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/send-reminders': {
       id: '/api/public/send-reminders'
       path: '/api/public/send-reminders'
@@ -224,18 +244,9 @@ const rootRouteChildren: RootRouteChildren = {
   CommunityRoute: CommunityRoute,
   MyAppointmentsRoute: MyAppointmentsRoute,
   NewsRoute: NewsRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   ApiPublicSendRemindersRoute: ApiPublicSendRemindersRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

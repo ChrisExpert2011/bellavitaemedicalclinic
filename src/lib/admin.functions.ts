@@ -48,6 +48,7 @@ export const createWorker = createServerFn({ method: "POST" })
         full_name: data.fullName,
         specialty: data.specialty,
         phones: data.phone || null,
+        user_id: created.user?.id ?? null,
       });
     }
 
