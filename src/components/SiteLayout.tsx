@@ -51,9 +51,14 @@ export function SiteLayout({ children }: { children: ReactNode }) {
               </Link>
             ))}
             {isStaff ? (
-              <Link to="/admin" className="text-sm font-medium text-primary hover:underline">
-                {isAdmin ? "Admin" : "Staff"}
-              </Link>
+              <>
+                <Link to="/dashboard" className="text-sm font-medium text-primary hover:underline">
+                  Dashboard
+                </Link>
+                <Link to="/admin" className="text-sm font-medium text-primary hover:underline">
+                  {isAdmin ? "Admin" : "Staff"}
+                </Link>
+              </>
             ) : null}
             {user ? (
               <>
@@ -100,9 +105,14 @@ export function SiteLayout({ children }: { children: ReactNode }) {
               </Link>
             ))}
             {isStaff ? (
-              <Link to="/admin" onClick={() => setOpen(false)} className="py-2 text-sm text-primary">
-                {isAdmin ? "Admin" : "Staff"}
-              </Link>
+              <>
+                <Link to="/dashboard" onClick={() => setOpen(false)} className="py-2 text-sm text-primary">
+                  Dashboard
+                </Link>
+                <Link to="/admin" onClick={() => setOpen(false)} className="py-2 text-sm text-primary">
+                  {isAdmin ? "Admin" : "Staff"}
+                </Link>
+              </>
             ) : null}
             {user ? (
               <>

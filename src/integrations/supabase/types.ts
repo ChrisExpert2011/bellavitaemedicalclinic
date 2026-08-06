@@ -181,6 +181,51 @@ export type Database = {
         }
         Relationships: []
       }
+      contact_messages: {
+        Row: {
+          created_at: string
+          id: string
+          message: string
+          read_at: string | null
+          sender_email: string | null
+          sender_name: string
+          sender_phone: string | null
+          status: string
+          subject: string
+          to_label: string | null
+          to_user_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message: string
+          read_at?: string | null
+          sender_email?: string | null
+          sender_name: string
+          sender_phone?: string | null
+          status?: string
+          subject?: string
+          to_label?: string | null
+          to_user_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string
+          read_at?: string | null
+          sender_email?: string | null
+          sender_name?: string
+          sender_phone?: string | null
+          status?: string
+          subject?: string
+          to_label?: string | null
+          to_user_id?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       phone_otps: {
         Row: {
           attempts: number
@@ -292,6 +337,7 @@ export type Database = {
           sort_order: number
           specialty: string
           updated_at: string
+          user_id: string | null
         }
         Insert: {
           created_at?: string
@@ -301,6 +347,7 @@ export type Database = {
           sort_order?: number
           specialty: string
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
           created_at?: string
@@ -310,6 +357,7 @@ export type Database = {
           sort_order?: number
           specialty?: string
           updated_at?: string
+          user_id?: string | null
         }
         Relationships: []
       }

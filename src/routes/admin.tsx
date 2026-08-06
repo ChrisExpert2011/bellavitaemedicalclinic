@@ -7,6 +7,7 @@ import { SiteLayout } from "@/components/SiteLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { createWorker } from "@/lib/admin.functions";
+import { listWorkers, deleteWorker } from "@/lib/staff.functions";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -23,7 +24,7 @@ export const Route = createFileRoute("/admin")({
   component: AdminPage,
 });
 
-const TABS = ["Appointments", "Contacts", "Workers", "News", "Team"] as const;
+const TABS = ["Appointments", "Messages", "Contacts", "Workers", "News", "Team"] as const;
 type Tab = (typeof TABS)[number];
 
 function AdminPage() {
@@ -54,7 +55,7 @@ function AdminPage() {
     );
   }
 
-  const visibleTabs = isAdmin ? TABS : (["Appointments", "News"] as const);
+  const visibleTabs = isAdmin ? TABS : (["Appointments", "Messages", "News"] as const);
 
   return (
     <SiteLayout>
@@ -75,6 +76,7 @@ function AdminPage() {
         </div>
         <div className="py-8">
           {tab === "Appointments" ? <AppointmentsTab /> : null}
+          {tab === "Messages" ? <MessagesTab isAdmin={isAdmin} /> : null}
           {tab === "Contacts" && isAdmin ? <ContactsTab /> : null}
           {tab === "Workers" && isAdmin ? <WorkersTab /> : null}
           {tab === "News" ? <NewsTab /> : null}
@@ -180,6 +182,85 @@ function ContactsTab() {
   );
 }
 
+function MessagesTab({ isAdmin }: { isAdmin: boolean }) {
+  const qc = useQueryClient();
+  const { data } = useQuery({
+    queryKey: ["admin_messages"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("contact_messages")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const markRead = async (id: string) => {
+    const { error } = await supabase
+      .from("contact_messages")
+      .update({ status: "read", read_at: new Date().toISOString() })
+      .eq("id", id);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    qc.invalidateQueries({ queryKey: ["admin_messages"] });
+  };
+
+  const remove = async (id: string) => {
+    const { error } = await supabase.from("contact_messages").delete().eq("id", id);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    qc.invalidateQueries({ queryKey: ["admin_messages"] });
+  };
+
+  return (
+    <div className="space-y-3">
+      <p className="text-sm text-muted-foreground">
+        Messages sent from the “Contact us” form arrive here — nothing is sent by email.
+      </p>
+      {(data ?? []).map((m) => (
+        <div key={m.id} className="rounded-xl border border-border bg-card p-4">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <p className="font-semibold">{m.subject}</p>
+            <span
+              className={`rounded-full px-2 py-0.5 text-xs ${
+                m.status === "new" ? "bg-accent/20 text-accent-foreground" : "bg-secondary"
+              }`}
+            >
+              {m.status}
+            </span>
+          </div>
+          <p className="mt-1 text-sm text-muted-foreground">
+            From {m.sender_name}
+            {m.sender_phone ? ` · ${m.sender_phone}` : ""}
+            {m.sender_email ? ` · ${m.sender_email}` : ""} · to {m.to_label ?? "Reception"}
+          </p>
+          <p className="mt-2 whitespace-pre-wrap text-sm">{m.message}</p>
+          <div className="mt-2 flex gap-4">
+            {m.status === "new" ? (
+              <button onClick={() => markRead(m.id)} className="text-xs text-primary hover:underline">
+                Mark as read
+              </button>
+            ) : null}
+            {isAdmin ? (
+              <button onClick={() => remove(m.id)} className="text-xs text-destructive hover:underline">
+                Delete
+              </button>
+            ) : null}
+          </div>
+        </div>
+      ))}
+      {(data ?? []).length === 0 ? (
+        <p className="text-sm text-muted-foreground">No messages yet.</p>
+      ) : null}
+    </div>
+  );
+}
+
 function ContactCard({
   contact,
   onSave,
@@ -208,6 +289,9 @@ function ContactCard({
 
 function WorkersTab() {
   const register = useServerFn(createWorker);
+  const fetchWorkers = useServerFn(listWorkers);
+  const removeWorker = useServerFn(deleteWorker);
+  const qc = useQueryClient();
   const [form, setForm] = useState({
     fullName: "",
     email: "",
@@ -218,6 +302,23 @@ function WorkersTab() {
   const [busy, setBusy] = useState(false);
   const set = (k: string, v: string) => setForm((f) => ({ ...f, [k]: v }));
 
+  const { data: workers } = useQuery({
+    queryKey: ["admin_workers"],
+    queryFn: async () => (await fetchWorkers({ data: undefined })).workers,
+  });
+
+  const onDelete = async (id: string, name: string) => {
+    if (!window.confirm(`Delete the account of ${name}? This cannot be undone.`)) return;
+    try {
+      await removeWorker({ data: { userId: id } });
+      toast.success("Worker deleted");
+      qc.invalidateQueries({ queryKey: ["admin_workers"] });
+      qc.invalidateQueries({ queryKey: ["staff_members"] });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not delete the worker");
+    }
+  };
+
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setBusy(true);
@@ -225,6 +326,8 @@ function WorkersTab() {
       await register({ data: { ...form, addToTeam: true } });
       toast.success(`Worker account created for ${form.email}`);
       setForm({ fullName: "", email: "", password: "", phone: "", specialty: "" });
+      qc.invalidateQueries({ queryKey: ["admin_workers"] });
+      qc.invalidateQueries({ queryKey: ["staff_members"] });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Could not create the worker");
     } finally {
@@ -233,7 +336,8 @@ function WorkersTab() {
   };
 
   return (
-    <div className="max-w-xl">
+    <div className="grid gap-6 lg:grid-cols-2">
+      <div>
       <h2 className="text-lg font-semibold">Register a worker</h2>
       <p className="mt-1 text-sm text-muted-foreground">
         Create login credentials for a staff member. They can change their name, phone and password
@@ -259,6 +363,45 @@ function WorkersTab() {
           {busy ? "Creating…" : "Create worker account"}
         </button>
       </form>
+      </div>
+      <div>
+        <h2 className="text-lg font-semibold">Registered workers</h2>
+        <div className="mt-4 overflow-x-auto rounded-xl border border-border bg-card">
+          <table className="w-full text-sm">
+            <thead className="bg-secondary/60 text-left">
+              <tr>
+                {["Name", "Specialty", "Phone", "Email", "Role", ""].map((h) => (
+                  <th key={h} className="px-3 py-2 font-medium">{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {(workers ?? []).map((w) => (
+                <tr key={w.id} className="border-t border-border">
+                  <td className="px-3 py-2">{w.fullName || "—"}</td>
+                  <td className="px-3 py-2">{w.specialty || "—"}</td>
+                  <td className="px-3 py-2">{w.phone || "—"}</td>
+                  <td className="px-3 py-2">{w.email}</td>
+                  <td className="px-3 py-2">{w.role}</td>
+                  <td className="px-3 py-2">
+                    {w.role === "admin" ? null : (
+                      <button
+                        onClick={() => onDelete(w.id, w.fullName || w.email)}
+                        className="text-xs text-destructive hover:underline"
+                      >
+                        Delete
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {(workers ?? []).length === 0 ? (
+            <p className="p-4 text-sm text-muted-foreground">No workers registered yet.</p>
+          ) : null}
+        </div>
+      </div>
     </div>
   );
 }
