@@ -15,6 +15,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AppointmentsRouteImport } from './routes/appointments'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CommunityRouteImport } from './routes/community'
+import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as MyAppointmentsRouteImport } from './routes/my-appointments'
 import { Route as NewsRouteImport } from './routes/news'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
@@ -50,6 +51,11 @@ const CommunityRoute = CommunityRouteImport.update({
   path: '/community',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MyAppointmentsRoute = MyAppointmentsRouteImport.update({
   id: '/my-appointments',
   path: '/my-appointments',
@@ -78,6 +84,7 @@ export interface FileRoutesByFullPath {
   '/appointments': typeof AppointmentsRoute
   '/auth': typeof AuthRoute
   '/community': typeof CommunityRoute
+  '/dashboard': typeof DashboardRoute
   '/my-appointments': typeof MyAppointmentsRoute
   '/news': typeof NewsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -90,6 +97,7 @@ export interface FileRoutesByTo {
   '/appointments': typeof AppointmentsRoute
   '/auth': typeof AuthRoute
   '/community': typeof CommunityRoute
+  '/dashboard': typeof DashboardRoute
   '/my-appointments': typeof MyAppointmentsRoute
   '/news': typeof NewsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -103,6 +111,7 @@ export interface FileRoutesById {
   '/appointments': typeof AppointmentsRoute
   '/auth': typeof AuthRoute
   '/community': typeof CommunityRoute
+  '/dashboard': typeof DashboardRoute
   '/my-appointments': typeof MyAppointmentsRoute
   '/news': typeof NewsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -117,6 +126,7 @@ export interface FileRouteTypes {
     | '/appointments'
     | '/auth'
     | '/community'
+    | '/dashboard'
     | '/my-appointments'
     | '/news'
     | '/sitemap.xml'
@@ -129,6 +139,7 @@ export interface FileRouteTypes {
     | '/appointments'
     | '/auth'
     | '/community'
+    | '/dashboard'
     | '/my-appointments'
     | '/news'
     | '/sitemap.xml'
@@ -141,6 +152,7 @@ export interface FileRouteTypes {
     | '/appointments'
     | '/auth'
     | '/community'
+    | '/dashboard'
     | '/my-appointments'
     | '/news'
     | '/sitemap.xml'
@@ -154,6 +166,7 @@ export interface RootRouteChildren {
   AppointmentsRoute: typeof AppointmentsRoute
   AuthRoute: typeof AuthRoute
   CommunityRoute: typeof CommunityRoute
+  DashboardRoute: typeof DashboardRoute
   MyAppointmentsRoute: typeof MyAppointmentsRoute
   NewsRoute: typeof NewsRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -204,6 +217,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CommunityRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/my-appointments': {
       id: '/my-appointments'
       path: '/my-appointments'
@@ -242,6 +262,7 @@ const rootRouteChildren: RootRouteChildren = {
   AppointmentsRoute: AppointmentsRoute,
   AuthRoute: AuthRoute,
   CommunityRoute: CommunityRoute,
+  DashboardRoute: DashboardRoute,
   MyAppointmentsRoute: MyAppointmentsRoute,
   NewsRoute: NewsRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,

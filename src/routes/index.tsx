@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { CalendarCheck, Clock, CreditCard, Languages, MapPin, ShieldCheck } from "lucide-react";
 import heroImage from "@/assets/hero.jpg";
 import { SiteLayout } from "@/components/SiteLayout";
+import { ContactForm } from "@/components/ContactForm";
 import { supabase } from "@/integrations/supabase/client";
 import {
   CLINIC_ADDRESS,
@@ -206,6 +207,9 @@ function Index() {
               </a>
             </div>
           ))}
+        </div>
+        <div className="mt-8">
+          <ContactForm />
         </div>
       </section>
     </SiteLayout>
