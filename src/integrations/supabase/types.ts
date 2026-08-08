@@ -63,6 +63,8 @@ export type Database = {
       }
       appointments: {
         Row: {
+          acknowledged_at: string | null
+          acknowledged_by: string | null
           cancellation_reason: string | null
           cancelled_at: string | null
           code: string | null
@@ -84,6 +86,8 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
           cancellation_reason?: string | null
           cancelled_at?: string | null
           code?: string | null
@@ -105,6 +109,8 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
           cancellation_reason?: string | null
           cancelled_at?: string | null
           code?: string | null
@@ -222,6 +228,33 @@ export type Database = {
           subject?: string
           to_label?: string | null
           to_user_id?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      insurances: {
+        Row: {
+          active: boolean
+          created_at: string
+          id: string
+          name: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          name: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          name?: string
+          sort_order?: number
           updated_at?: string
         }
         Relationships: []
