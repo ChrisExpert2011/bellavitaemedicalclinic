@@ -5,15 +5,121 @@ import heroImage from "@/assets/hero.jpg";
 import { SiteLayout } from "@/components/SiteLayout";
 import { ContactForm } from "@/components/ContactForm";
 import { supabase } from "@/integrations/supabase/client";
+import { useInsurances } from "@/hooks/useInsurances";
 import {
   CLINIC_ADDRESS,
   CLINIC_MAP_QUERY,
   CLINIC_NAME,
-  INSURANCES,
   LANGUAGES,
   PAYMENTS,
   SCHEDULE,
 } from "@/lib/clinic";
+
+const SITE_URL = "https://bellavitaemedicalclinic.lovable.app";
+
+const KEYWORDS = [
+  "Bella Vitae",
+  "BellaVitae",
+  "Bella Vita",
+  "BellaVita",
+  "Bella Vitae Medical Clinic",
+  "bellavitaemedicalclinic",
+  "Bella Vitae Kigali",
+  "Bella Rwanda",
+  "bellarwanda",
+  "Bella Clinic",
+  "bellaclinic",
+  "Bella Clinic Kigali",
+  "Vitae Clinic",
+  "vitaeclinic",
+  "Vita Clinic Rwanda",
+  "clinic Kigali",
+  "medical clinic Kigali",
+  "clinique Kigali",
+  "hospital KN 5 Rd Kigali",
+  "doctor Kigali",
+  "dentist Kigali",
+  "gynecologist Kigali",
+  "internal medicine Kigali",
+  "RSSB clinic Kigali",
+  "MMI clinic Kigali",
+  "book doctor appointment Rwanda",
+].join(", ");
+
+const DOCTORS = [
+  { name: "Antoine HABIYAMBERE", specialty: "General practitioner", phone: "+250784259304" },
+  { name: "Carine KANEZA", specialty: "General practitioner" },
+  { name: "Pascaline ISHIMWE", specialty: "Dental therapist" },
+  { name: "Theodomir SEBAZUNGU", specialty: "Gynecologist" },
+  { name: "Marcellin MUSABENDE", specialty: "Internal medicine specialist" },
+];
+
+const CLINIC_JSON_LD = {
+  "@context": "https://schema.org",
+  "@type": "MedicalClinic",
+  "@id": `${SITE_URL}/#clinic`,
+  name: CLINIC_NAME,
+  alternateName: [
+    "Bella Vitae",
+    "Bella Vita Clinic",
+    "Bella Clinic Kigali",
+    "Vitae Clinic Kigali",
+    "bellavitaemedicalclinic",
+  ],
+  url: SITE_URL,
+  description:
+    "Bella Vitae Medical Clinic on KN 5 Rd, Kigali — general medicine, dentistry, gynecology and internal medicine, open daily 07:00–23:00.",
+  telephone: "+250788275617",
+  email: "nibellasheja@gmail.com",
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: "KN 5 Rd",
+    addressLocality: "Kigali",
+    addressCountry: "RW",
+  },
+  areaServed: "Kigali, Rwanda",
+  availableLanguage: ["Kinyarwanda", "English"],
+  paymentAccepted: "Cash, Cards, Cheques, Mobile money",
+  currenciesAccepted: "RWF",
+  medicalSpecialty: [
+    "PrimaryCare",
+    "Dentistry",
+    "Obstetric",
+    "InternalMedicine",
+  ],
+  openingHoursSpecification: [
+    {
+      "@type": "OpeningHoursSpecification",
+      dayOfWeek: [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday",
+      ],
+      opens: "07:00",
+      closes: "23:00",
+    },
+  ],
+  employee: DOCTORS.map((d) => ({
+    "@type": "Physician",
+    name: d.name,
+    medicalSpecialty: d.specialty,
+    ...(d.phone ? { telephone: d.phone } : {}),
+    worksFor: { "@id": `${SITE_URL}/#clinic` },
+  })),
+  potentialAction: {
+    "@type": "ReserveAction",
+    target: {
+      "@type": "EntryPoint",
+      urlTemplate: `${SITE_URL}/appointments`,
+      actionPlatform: "https://schema.org/DesktopWebPlatform",
+    },
+    result: { "@type": "Reservation", name: "Clinic appointment" },
+  },
+};
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -24,10 +130,34 @@ export const Route = createFileRoute("/")({
         content:
           "Bella Vitae Medical Clinic on KN 5 Rd, Kigali. General medicine, dentistry, gynecology, internal medicine. Open daily 07:00–23:00. Book online.",
       },
+      { name: "keywords", content: KEYWORDS },
+      { name: "geo.region", content: "RW-01" },
+      { name: "geo.placename", content: "Kigali" },
       { property: "og:title", content: "Bella Vitae Medical Clinic | Kigali, open 07:00–23:00" },
       {
         property: "og:description",
         content: "Bella Vitae Medical Clinic on KN 5 Rd, Kigali. General medicine, dentistry, gynecology, internal medicine. Open daily 07:00–23:00. Book online.",
+      },
+      { property: "og:url", content: SITE_URL },
+      { property: "og:site_name", content: CLINIC_NAME },
+    ],
+    links: [{ rel: "canonical", href: SITE_URL }],
+    scripts: [
+      { type: "application/ld+json", children: JSON.stringify(CLINIC_JSON_LD) },
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          name: CLINIC_NAME,
+          alternateName: ["Bella Vitae", "Bella Vita", "Bella Clinic", "Vitae Clinic"],
+          url: SITE_URL,
+          potentialAction: {
+            "@type": "SearchAction",
+            target: `${SITE_URL}/news?q={search_term_string}`,
+            "query-input": "required name=search_term_string",
+          },
+        }),
       },
     ],
   }),
@@ -35,6 +165,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
+  const { names: insuranceNames } = useInsurances();
   const { data: team } = useQuery({
     queryKey: ["staff_members"],
     queryFn: async () => {
@@ -149,7 +280,7 @@ function Index() {
           <div>
             <h2 className="text-2xl font-bold text-primary">Prices & insurances</h2>
             <ul className="mt-4 flex flex-wrap gap-2">
-              {INSURANCES.filter((i) => i !== "None / Private").map((i) => (
+              {insuranceNames.filter((i) => i !== "None / Private").map((i) => (
                 <li
                   key={i}
                   className="rounded-full border border-border bg-card px-3 py-1 text-sm font-medium"
