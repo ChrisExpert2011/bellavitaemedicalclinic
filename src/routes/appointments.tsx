@@ -1,10 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { toast } from "sonner";
 import { SiteLayout } from "@/components/SiteLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useInsurances } from "@/hooks/useInsurances";
+import { notifyDoctorOfBooking } from "@/lib/notify.functions";
 import { INSURANCES, TIME_SLOTS } from "@/lib/clinic";
 
 export const Route = createFileRoute("/appointments")({
@@ -28,6 +31,8 @@ export const Route = createFileRoute("/appointments")({
 
 function AppointmentsPage() {
   const { user } = useAuth();
+  const { names: insuranceNames } = useInsurances();
+  const notifyDoctor = useServerFn(notifyDoctorOfBooking);
   const [form, setForm] = useState({
     patient_name: "",
     phone: "",
@@ -83,6 +88,7 @@ function AppointmentsPage() {
       if (error) throw error;
       setCode(data as string);
       toast.success("Appointment requested!");
+      void notifyDoctor({ data: { code: data as string } }).catch(() => undefined);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Could not book the appointment");
     } finally {
@@ -143,7 +149,7 @@ function AppointmentsPage() {
                 onChange={(e) => set("insurance", e.target.value)}
                 className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
               >
-                {INSURANCES.map((i) => (
+                {insuranceNames.map((i) => (
                   <option key={i}>{i}</option>
                 ))}
               </select>
