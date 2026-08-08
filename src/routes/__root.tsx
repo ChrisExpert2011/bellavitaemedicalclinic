@@ -87,7 +87,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "author", content: "Bella Vitae Medical Clinic" },
       {
         name: "google-site-verification",
-        content: "ecxwZRxbfyoIEcW3KlFsQTORoRg_4Lv2qgVIgUKLyfY",
+        content: "0pIEUMJr76PnKKJW5IICD_Da-OdRTHao2cgUPtXiapU",
       },
       { property: "og:title", content: "Bella Vitae Medical Clinic | Kigali, open 07:00–23:00" },
       {
