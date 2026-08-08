@@ -24,7 +24,7 @@ export const Route = createFileRoute("/admin")({
   component: AdminPage,
 });
 
-const TABS = ["Appointments", "Messages", "Contacts", "Workers", "News", "Team"] as const;
+const TABS = ["Appointments", "Messages", "Contacts", "Insurances", "Workers", "News", "Team"] as const;
 type Tab = (typeof TABS)[number];
 
 function AdminPage() {
@@ -78,6 +78,7 @@ function AdminPage() {
           {tab === "Appointments" ? <AppointmentsTab /> : null}
           {tab === "Messages" ? <MessagesTab isAdmin={isAdmin} /> : null}
           {tab === "Contacts" && isAdmin ? <ContactsTab /> : null}
+          {tab === "Insurances" && isAdmin ? <InsurancesTab /> : null}
           {tab === "Workers" && isAdmin ? <WorkersTab /> : null}
           {tab === "News" ? <NewsTab /> : null}
           {tab === "Team" && isAdmin ? <TeamTab /> : null}
@@ -89,6 +90,7 @@ function AdminPage() {
 
 function AppointmentsTab() {
   const qc = useQueryClient();
+  const { isAdmin } = useAuth();
   const { data } = useQuery({
     queryKey: ["admin_appointments"],
     queryFn: async () => {
@@ -110,13 +112,24 @@ function AppointmentsTab() {
     qc.invalidateQueries({ queryKey: ["admin_appointments"] });
   };
 
+  const remove = async (id: string, code: string | null) => {
+    if (!window.confirm(`Delete appointment ${code ?? ""}? This cannot be undone.`)) return;
+    const { error } = await supabase.from("appointments").delete().eq("id", id);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success("Appointment deleted");
+    qc.invalidateQueries({ queryKey: ["admin_appointments"] });
+  };
+
   return (
     <div className="overflow-x-auto rounded-xl border border-border bg-card">
       <table className="w-full text-sm">
         <thead className="bg-secondary/60 text-left">
           <tr>
-            {["Code", "Patient", "Phone", "Insurance", "Doctor", "When", "Status", ""].map((h) => (
-              <th key={h} className="px-3 py-2 font-medium">{h}</th>
+            {["Code", "Patient", "Phone", "Insurance", "Doctor", "When", "Status", "", ""].map((h, i) => (
+              <th key={`${h}-${i}`} className="px-3 py-2 font-medium">{h}</th>
             ))}
           </tr>
         </thead>
@@ -141,6 +154,16 @@ function AppointmentsTab() {
                   ))}
                 </select>
               </td>
+              <td className="px-3 py-2">
+                {isAdmin ? (
+                  <button
+                    onClick={() => remove(a.id, a.code)}
+                    className="text-xs text-destructive hover:underline"
+                  >
+                    Delete
+                  </button>
+                ) : null}
+              </td>
             </tr>
           ))}
         </tbody>
@@ -148,6 +171,150 @@ function AppointmentsTab() {
       {(data ?? []).length === 0 ? (
         <p className="p-4 text-muted-foreground">No appointments yet.</p>
       ) : null}
+    </div>
+  );
+}
+
+function InsurancesTab() {
+  const qc = useQueryClient();
+  const [name, setName] = useState("");
+
+  const { data } = useQuery({
+    queryKey: ["admin_insurances"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("insurances")
+        .select("*")
+        .order("sort_order");
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const refresh = () => {
+    qc.invalidateQueries({ queryKey: ["admin_insurances"] });
+    qc.invalidateQueries({ queryKey: ["insurances"] });
+  };
+
+  const add = async () => {
+    if (name.trim().length < 2) {
+      toast.error("Enter the insurance name");
+      return;
+    }
+    const { error } = await supabase.from("insurances").insert({
+      name: name.trim().toUpperCase(),
+      sort_order: (data?.length ?? 0) + 1,
+    });
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    setName("");
+    toast.success("Insurance added");
+    refresh();
+  };
+
+  const rename = async (id: string, value: string) => {
+    const { error } = await supabase.from("insurances").update({ name: value }).eq("id", id);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success("Insurance updated");
+    refresh();
+  };
+
+  const toggle = async (id: string, active: boolean) => {
+    const { error } = await supabase.from("insurances").update({ active }).eq("id", id);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    refresh();
+  };
+
+  const remove = async (id: string, label: string) => {
+    if (!window.confirm(`Remove ${label} from the accepted insurances?`)) return;
+    const { error } = await supabase.from("insurances").delete().eq("id", id);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    refresh();
+  };
+
+  return (
+    <div className="grid gap-6 lg:grid-cols-2">
+      <div className="space-y-3 rounded-xl border border-border bg-card p-4">
+        <h2 className="text-lg font-semibold">Add an insurance</h2>
+        <p className="text-sm text-muted-foreground">
+          Insurances listed here appear on the homepage and in the booking form.
+        </p>
+        <Field label="Insurance name" value={name} onChange={setName} />
+        <button
+          onClick={add}
+          className="rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground"
+        >
+          Add insurance
+        </button>
+      </div>
+      <div className="space-y-3">
+        {(data ?? []).map((i) => (
+          <InsuranceRow
+            key={i.id}
+            insurance={i}
+            onRename={rename}
+            onToggle={toggle}
+            onRemove={remove}
+          />
+        ))}
+        {(data ?? []).length === 0 ? (
+          <p className="text-sm text-muted-foreground">No insurances yet.</p>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
+function InsuranceRow({
+  insurance,
+  onRename,
+  onToggle,
+  onRemove,
+}: {
+  insurance: { id: string; name: string; active: boolean };
+  onRename: (id: string, value: string) => void;
+  onToggle: (id: string, active: boolean) => void;
+  onRemove: (id: string, label: string) => void;
+}) {
+  const [value, setValue] = useState(insurance.name);
+  return (
+    <div className="flex flex-wrap items-center gap-3 rounded-xl border border-border bg-card p-3">
+      <input
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        className="min-w-40 flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm"
+      />
+      <label className="flex items-center gap-2 text-xs">
+        <input
+          type="checkbox"
+          checked={insurance.active}
+          onChange={(e) => onToggle(insurance.id, e.target.checked)}
+        />
+        Accepted
+      </label>
+      <button
+        onClick={() => onRename(insurance.id, value.trim())}
+        className="rounded-md bg-secondary px-3 py-2 text-xs font-medium"
+      >
+        Save
+      </button>
+      <button
+        onClick={() => onRemove(insurance.id, insurance.name)}
+        className="text-xs text-destructive hover:underline"
+      >
+        Delete
+      </button>
     </div>
   );
 }

@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { SiteLayout } from "@/components/SiteLayout";
+import { NewBookingAlert } from "@/components/NewBookingAlert";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -127,6 +128,7 @@ function DashboardPage() {
   return (
     <SiteLayout>
       <div className="mx-auto max-w-5xl px-4 py-10">
+        {profileName ? <NewBookingAlert doctorName={profileName} /> : null}
         <h1 className="text-3xl font-bold text-primary">My dashboard</h1>
         <p className="mt-1 text-sm text-muted-foreground">
           {profileName || user?.email} · messages and appointments addressed to you
