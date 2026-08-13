@@ -25,6 +25,7 @@ export const requestPhoneOtp = createServerFn({ method: "POST" })
     return {
       sent: result.sent,
       smsConfigured: smsConfigured(),
+      error: result.sent ? null : (result.error ?? null),
       // Only returned while no SMS provider is connected, so the flow stays usable.
       devCode: result.sent ? null : code,
     };
