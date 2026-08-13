@@ -510,6 +510,11 @@ function WorkersTab() {
         Create login credentials for a staff member. They can change their name, phone and password
         themselves from “My account”.
       </p>
+      <p className="mt-2 rounded-lg bg-secondary/60 p-3 text-xs text-muted-foreground">
+        Give the worker the work email and temporary password below. They sign in at{" "}
+        <strong>/auth</strong> and land on their own <strong>/dashboard</strong>, where they see
+        their messages and appointments and can change their password.
+      </p>
       <form onSubmit={submit} className="mt-4 space-y-3 rounded-xl border border-border bg-card p-4">
         <Field label="Full name" value={form.fullName} onChange={(v) => set("fullName", v)} required />
         <Field label="Specialty / job title" value={form.specialty} onChange={(v) => set("specialty", v)} required />
