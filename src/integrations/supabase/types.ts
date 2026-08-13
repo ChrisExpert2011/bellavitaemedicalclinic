@@ -70,6 +70,7 @@ export type Database = {
           code: string | null
           created_at: string
           doctor: string
+          email: string | null
           id: string
           insurance: string
           insurance_card: string | null
@@ -93,6 +94,7 @@ export type Database = {
           code?: string | null
           created_at?: string
           doctor: string
+          email?: string | null
           id?: string
           insurance: string
           insurance_card?: string | null
@@ -116,6 +118,7 @@ export type Database = {
           code?: string | null
           created_at?: string
           doctor?: string
+          email?: string | null
           id?: string
           insurance?: string
           insurance_card?: string | null
@@ -420,19 +423,34 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      book_appointment: {
-        Args: {
-          _doctor: string
-          _insurance: string
-          _insurance_card: string
-          _patient_name: string
-          _phone: string
-          _reason: string
-          _requested_date: string
-          _requested_time: string
-        }
-        Returns: string
-      }
+      book_appointment:
+        | {
+            Args: {
+              _doctor: string
+              _insurance: string
+              _insurance_card: string
+              _patient_name: string
+              _phone: string
+              _reason: string
+              _requested_date: string
+              _requested_time: string
+            }
+            Returns: string
+          }
+        | {
+            Args: {
+              _doctor: string
+              _email?: string
+              _insurance: string
+              _insurance_card: string
+              _patient_name: string
+              _phone: string
+              _reason: string
+              _requested_date: string
+              _requested_time: string
+            }
+            Returns: string
+          }
       cancel_appointment_by_token: {
         Args: { _code: string; _reason?: string; _token: string }
         Returns: boolean
@@ -458,6 +476,7 @@ export type Database = {
           code: string
           created_at: string
           doctor: string
+          email: string
           insurance: string
           insurance_card: string
           patient_name: string
