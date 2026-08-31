@@ -18,32 +18,13 @@ import {
 const SITE_URL = "https://bellavitaemedicalclinic.lovable.app";
 
 const KEYWORDS = [
+  "bellavitae",
   "Bella Vitae",
   "BellaVitae",
-  "Bella Vita",
-  "BellaVita",
-  "Bella Vitae Medical Clinic",
   "bellavitaemedicalclinic",
-  "Bella Vitae Kigali",
-  "Bella Rwanda",
-  "bellarwanda",
-  "Bella Clinic",
-  "bellaclinic",
-  "Bella Clinic Kigali",
-  "Vitae Clinic",
-  "vitaeclinic",
-  "Vita Clinic Rwanda",
-  "clinic Kigali",
-  "medical clinic Kigali",
-  "clinique Kigali",
-  "hospital KN 5 Rd Kigali",
-  "doctor Kigali",
-  "dentist Kigali",
-  "gynecologist Kigali",
-  "internal medicine Kigali",
-  "RSSB clinic Kigali",
-  "MMI clinic Kigali",
-  "book doctor appointment Rwanda",
+  "Bella Vitae Medical Clinic",
+  "bellavitae clinic",
+  "bellavitaemedicalclinic kigali",
 ].join(", ");
 
 const DOCTORS = [
