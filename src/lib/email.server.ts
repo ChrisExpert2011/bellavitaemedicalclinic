@@ -18,6 +18,8 @@ export async function sendEmail(opts: {
   }
   try {
     const { sendLovableEmail } = await import("@lovable.dev/email-js");
+    const emailOptions: { apiKey: string; idempotencyKey?: string } = { apiKey };
+    if (opts.idempotencyKey) emailOptions.idempotencyKey = opts.idempotencyKey;
     const res = await sendLovableEmail(
       {
         to: opts.to,
@@ -28,7 +30,7 @@ export async function sendEmail(opts: {
         text: opts.text,
         purpose: "transactional",
       },
-      { apiKey, idempotencyKey: opts.idempotencyKey },
+      emailOptions,
     );
     return { sent: Boolean(res.success) };
   } catch (err) {
