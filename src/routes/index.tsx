@@ -125,7 +125,7 @@ export const Route = createFileRoute("/")({
           "@context": "https://schema.org",
           "@type": "WebSite",
           name: CLINIC_NAME,
-          alternateName: ["Bella Vitae", "Bella Vita", "Bella Clinic", "Vitae Clinic"],
+          alternateName: ["bellavitae", "bellavitaemedicalclinic"],
           url: SITE_URL,
           potentialAction: {
             "@type": "SearchAction",
