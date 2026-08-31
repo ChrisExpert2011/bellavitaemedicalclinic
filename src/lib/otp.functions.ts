@@ -40,7 +40,7 @@ export const requestPhoneOtp = createServerFn({ method: "POST" })
     const code = rows?.[0]?.code as string | undefined;
     if (!code) throw new Error("Could not create a verification code");
 
-    let result: { sent: boolean; error?: string } = {
+    let result: { sent: boolean; error?: string | undefined } = {
       sent: false,
       error: email ? undefined : "No e-mail address is saved with this phone number",
     };

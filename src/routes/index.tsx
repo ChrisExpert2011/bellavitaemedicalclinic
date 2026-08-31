@@ -18,32 +18,13 @@ import {
 const SITE_URL = "https://bellavitaemedicalclinic.lovable.app";
 
 const KEYWORDS = [
+  "bellavitae",
   "Bella Vitae",
   "BellaVitae",
-  "Bella Vita",
-  "BellaVita",
-  "Bella Vitae Medical Clinic",
   "bellavitaemedicalclinic",
-  "Bella Vitae Kigali",
-  "Bella Rwanda",
-  "bellarwanda",
-  "Bella Clinic",
-  "bellaclinic",
-  "Bella Clinic Kigali",
-  "Vitae Clinic",
-  "vitaeclinic",
-  "Vita Clinic Rwanda",
-  "clinic Kigali",
-  "medical clinic Kigali",
-  "clinique Kigali",
-  "hospital KN 5 Rd Kigali",
-  "doctor Kigali",
-  "dentist Kigali",
-  "gynecologist Kigali",
-  "internal medicine Kigali",
-  "RSSB clinic Kigali",
-  "MMI clinic Kigali",
-  "book doctor appointment Rwanda",
+  "Bella Vitae Medical Clinic",
+  "bellavitae clinic",
+  "bellavitaemedicalclinic kigali",
 ].join(", ");
 
 const DOCTORS = [
@@ -59,13 +40,7 @@ const CLINIC_JSON_LD = {
   "@type": "MedicalClinic",
   "@id": `${SITE_URL}/#clinic`,
   name: CLINIC_NAME,
-  alternateName: [
-    "Bella Vitae",
-    "Bella Vita Clinic",
-    "Bella Clinic Kigali",
-    "Vitae Clinic Kigali",
-    "bellavitaemedicalclinic",
-  ],
+  alternateName: ["bellavitae", "bellavitaemedicalclinic", "Bella Vitae Medical Clinic"],
   url: SITE_URL,
   description:
     "Bella Vitae Medical Clinic on KN 5 Rd, Kigali — general medicine, dentistry, gynecology and internal medicine, open daily 07:00–23:00.",
@@ -124,19 +99,19 @@ const CLINIC_JSON_LD = {
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Bella Vitae Medical Clinic | Kigali, open 07:00–23:00" },
+      { title: "Bella Vitae Medical Clinic | bellavitae · bellavitaemedicalclinic" },
       {
         name: "description",
         content:
-          "Bella Vitae Medical Clinic on KN 5 Rd, Kigali. General medicine, dentistry, gynecology, internal medicine. Open daily 07:00–23:00. Book online.",
+          "Bella Vitae Medical Clinic — bellavitae / bellavitaemedicalclinic. General medicine, dentistry, gynecology and internal medicine in Kigali. Open 07:00–23:00 daily. Book online.",
       },
       { name: "keywords", content: KEYWORDS },
       { name: "geo.region", content: "RW-01" },
       { name: "geo.placename", content: "Kigali" },
-      { property: "og:title", content: "Bella Vitae Medical Clinic | Kigali, open 07:00–23:00" },
+      { property: "og:title", content: "Bella Vitae Medical Clinic | bellavitae · bellavitaemedicalclinic" },
       {
         property: "og:description",
-        content: "Bella Vitae Medical Clinic on KN 5 Rd, Kigali. General medicine, dentistry, gynecology, internal medicine. Open daily 07:00–23:00. Book online.",
+        content: "Bella Vitae Medical Clinic — bellavitae / bellavitaemedicalclinic. General medicine, dentistry, gynecology and internal medicine in Kigali. Open 07:00–23:00 daily. Book online.",
       },
       { property: "og:url", content: SITE_URL },
       { property: "og:site_name", content: CLINIC_NAME },
@@ -150,7 +125,7 @@ export const Route = createFileRoute("/")({
           "@context": "https://schema.org",
           "@type": "WebSite",
           name: CLINIC_NAME,
-          alternateName: ["Bella Vitae", "Bella Vita", "Bella Clinic", "Vitae Clinic"],
+          alternateName: ["bellavitae", "bellavitaemedicalclinic"],
           url: SITE_URL,
           potentialAction: {
             "@type": "SearchAction",

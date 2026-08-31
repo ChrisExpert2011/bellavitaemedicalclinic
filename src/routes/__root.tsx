@@ -78,27 +78,27 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Bella Vitae Medical Clinic | Kigali, open 07:00–23:00" },
+      { title: "Bella Vitae Medical Clinic | bellavitae · bellavitaemedicalclinic" },
       {
         name: "description",
         content:
-          "Bella Vitae Medical Clinic on KN 5 Rd, Kigali. General medicine, dentistry, gynecology, internal medicine. Open daily 07:00–23:00. Book online.",
+          "Bella Vitae Medical Clinic — bellavitae / bellavitaemedicalclinic. General medicine, dentistry, gynecology and internal medicine in Kigali. Open 07:00–23:00 daily. Book online.",
       },
       { name: "author", content: "Bella Vitae Medical Clinic" },
       {
         name: "google-site-verification",
         content: "0pIEUMJr76PnKKJW5IICD_Da-OdRTHao2cgUPtXiapU",
       },
-      { property: "og:title", content: "Bella Vitae Medical Clinic | Kigali, open 07:00–23:00" },
+      { property: "og:title", content: "Bella Vitae Medical Clinic | bellavitae · bellavitaemedicalclinic" },
       {
         property: "og:description",
-        content: "Bella Vitae Medical Clinic on KN 5 Rd, Kigali. General medicine, dentistry, gynecology, internal medicine. Open daily 07:00–23:00. Book online.",
+        content: "Bella Vitae Medical Clinic — bellavitae / bellavitaemedicalclinic. General medicine, dentistry, gynecology and internal medicine in Kigali. Open 07:00–23:00 daily. Book online.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@Lovable" },
-      { name: "twitter:title", content: "Bella Vitae Medical Clinic | Kigali, open 07:00–23:00" },
-      { name: "twitter:description", content: "Bella Vitae Medical Clinic on KN 5 Rd, Kigali. General medicine, dentistry, gynecology, internal medicine. Open daily 07:00–23:00. Book online." },
+      { name: "twitter:title", content: "Bella Vitae Medical Clinic | bellavitae · bellavitaemedicalclinic" },
+      { name: "twitter:description", content: "Bella Vitae Medical Clinic — bellavitae / bellavitaemedicalclinic. General medicine, dentistry, gynecology and internal medicine in Kigali. Open 07:00–23:00 daily. Book online." },
       { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/9f63aa31-3356-4890-afa6-1bb4ef960ff8/id-preview-14b86647--a06db4e9-2e49-4bd2-afa6-48ba15c4dc48.lovable.app-1785781717373.png" },
       { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/9f63aa31-3356-4890-afa6-1bb4ef960ff8/id-preview-14b86647--a06db4e9-2e49-4bd2-afa6-48ba15c4dc48.lovable.app-1785781717373.png" },
     ],
