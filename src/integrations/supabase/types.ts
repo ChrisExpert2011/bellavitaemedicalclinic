@@ -423,34 +423,20 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      book_appointment:
-        | {
-            Args: {
-              _doctor: string
-              _insurance: string
-              _insurance_card: string
-              _patient_name: string
-              _phone: string
-              _reason: string
-              _requested_date: string
-              _requested_time: string
-            }
-            Returns: string
-          }
-        | {
-            Args: {
-              _doctor: string
-              _email?: string
-              _insurance: string
-              _insurance_card: string
-              _patient_name: string
-              _phone: string
-              _reason: string
-              _requested_date: string
-              _requested_time: string
-            }
-            Returns: string
-          }
+      book_appointment: {
+        Args: {
+          _doctor: string
+          _email?: string
+          _insurance: string
+          _insurance_card: string
+          _patient_name: string
+          _phone: string
+          _reason: string
+          _requested_date: string
+          _requested_time: string
+        }
+        Returns: string
+      }
       cancel_appointment_by_token: {
         Args: { _code: string; _reason?: string; _token: string }
         Returns: boolean
