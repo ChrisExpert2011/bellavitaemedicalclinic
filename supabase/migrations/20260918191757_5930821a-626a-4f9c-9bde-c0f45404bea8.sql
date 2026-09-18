@@ -1,0 +1,1 @@
+DROP FUNCTION IF EXISTS public.book_appointment(text,text,text,text,text,date,text,text);
