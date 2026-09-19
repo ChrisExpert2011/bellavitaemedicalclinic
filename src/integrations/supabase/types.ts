@@ -166,6 +166,27 @@ export type Database = {
         }
         Relationships: []
       }
+      clinic_settings: {
+        Row: {
+          created_at: string
+          id: string
+          notification_email: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          notification_email?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          notification_email?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       community_posts: {
         Row: {
           author_id: string

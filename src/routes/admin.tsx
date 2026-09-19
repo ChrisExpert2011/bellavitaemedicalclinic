@@ -24,7 +24,7 @@ export const Route = createFileRoute("/admin")({
   component: AdminPage,
 });
 
-const TABS = ["Appointments", "Messages", "Contacts", "Insurances", "Workers", "News", "Team"] as const;
+const TABS = ["Appointments", "Messages", "Contacts", "Insurances", "Workers", "News", "Team", "Settings"] as const;
 type Tab = (typeof TABS)[number];
 
 function AdminPage() {
@@ -82,6 +82,7 @@ function AdminPage() {
           {tab === "Workers" && isAdmin ? <WorkersTab /> : null}
           {tab === "News" ? <NewsTab /> : null}
           {tab === "Team" && isAdmin ? <TeamTab /> : null}
+          {tab === "Settings" && isAdmin ? <SettingsTab /> : null}
         </div>
       </div>
     </SiteLayout>
@@ -732,6 +733,64 @@ function TeamTab() {
           </div>
         ))}
       </div>
+    </div>
+  );
+}
+
+function SettingsTab() {
+  const qc = useQueryClient();
+  const [email, setEmail] = useState("");
+  const [loaded, setLoaded] = useState(false);
+
+  const { data } = useQuery({
+    queryKey: ["clinic_settings"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("clinic_settings")
+        .select("*")
+        .limit(1)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  if (data && !loaded) {
+    setLoaded(true);
+    setEmail(data.notification_email ?? "");
+  }
+
+  const save = async () => {
+    const value = email.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+    const { error } = data
+      ? await supabase.from("clinic_settings").update({ notification_email: value }).eq("id", data.id)
+      : await supabase.from("clinic_settings").insert({ notification_email: value });
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success("Notification email saved");
+    qc.invalidateQueries({ queryKey: ["clinic_settings"] });
+  };
+
+  return (
+    <div className="max-w-xl space-y-3 rounded-xl border border-border bg-card p-5">
+      <h2 className="text-lg font-semibold">Appointment notifications</h2>
+      <p className="text-sm text-muted-foreground">
+        Every new online booking is emailed to this address with the full patient details and the
+        appointment code.
+      </p>
+      <Field label="Notification email" type="email" value={email} onChange={setEmail} />
+      <button
+        onClick={save}
+        className="rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground"
+      >
+        Save
+      </button>
     </div>
   );
 }

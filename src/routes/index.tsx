@@ -2,6 +2,11 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { CalendarCheck, Clock, CreditCard, Languages, MapPin, ShieldCheck } from "lucide-react";
 import heroImage from "@/assets/hero.jpg";
+import exteriorAsset from "@/assets/clinic/exterior.jpeg.asset.json";
+import receptionAsset from "@/assets/clinic/reception.jpeg.asset.json";
+import dentalRoomAsset from "@/assets/clinic/dental-room.jpeg.asset.json";
+import servicesAsset from "@/assets/clinic/services.jpeg.asset.json";
+import parkingAsset from "@/assets/clinic/parking.jpeg.asset.json";
 import { SiteLayout } from "@/components/SiteLayout";
 import { ContactForm } from "@/components/ContactForm";
 import { supabase } from "@/integrations/supabase/client";
@@ -26,6 +31,14 @@ const KEYWORDS = [
   "bellavitae clinic",
   "bellavitaemedicalclinic kigali",
 ].join(", ");
+
+const GALLERY = [
+  { src: exteriorAsset.url, alt: "Bella Vitae Medical Clinic building entrance in Kigali", wide: true },
+  { src: receptionAsset.url, alt: "Bella Vitae Medical Clinic reception desk" },
+  { src: dentalRoomAsset.url, alt: "Dental treatment room at Bella Vitae Medical Clinic" },
+  { src: servicesAsset.url, alt: "Bella Vitae Clinic services poster: consultation, laboratory, echography, dental" },
+  { src: parkingAsset.url, alt: "Parking area in front of Bella Vitae Medical Clinic" },
+];
 
 const DOCTORS = [
   { name: "Antoine HABIYAMBERE", specialty: "General practitioner", phone: "+250784259304" },
@@ -230,6 +243,30 @@ function Index() {
             environment. We serve patients in Kinyarwanda and English, accept all major insurance
             schemes, and keep our doors open sixteen hours a day, every day of the week.
           </p>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-4 py-14">
+        <h2 className="text-3xl font-bold text-primary">Inside our clinic</h2>
+        <p className="mt-2 max-w-2xl text-muted-foreground">
+          A look at our entrance, reception, treatment rooms and the services we offer every day.
+        </p>
+        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {GALLERY.map((g) => (
+            <figure
+              key={g.src}
+              className={`overflow-hidden rounded-2xl border border-border bg-card shadow-sm ${
+                g.wide ? "sm:col-span-2" : ""
+              }`}
+            >
+              <img
+                src={g.src}
+                alt={g.alt}
+                loading="lazy"
+                className="h-60 w-full object-cover transition-transform duration-300 hover:scale-105 sm:h-72"
+              />
+            </figure>
+          ))}
         </div>
       </section>
 
