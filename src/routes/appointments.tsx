@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useInsurances } from "@/hooks/useInsurances";
 import { notifyDoctorOfBooking } from "@/lib/notify.functions";
+import { createBooking } from "@/lib/booking.functions";
 import { INSURANCES, TIME_SLOTS } from "@/lib/clinic";
 
 export const Route = createFileRoute("/appointments")({
@@ -33,9 +34,12 @@ function AppointmentsPage() {
   const { user } = useAuth();
   const { names: insuranceNames } = useInsurances();
   const notifyDoctor = useServerFn(notifyDoctorOfBooking);
+  const book = useServerFn(createBooking);
+  const todayISO = new Date().toISOString().slice(0, 10);
   const [form, setForm] = useState({
     patient_name: "",
     phone: "",
+    email: "",
     insurance: INSURANCES[0] as string,
     insurance_card: "",
     doctor: "",
