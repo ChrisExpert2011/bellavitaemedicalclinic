@@ -2,6 +2,11 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { CalendarCheck, Clock, CreditCard, Languages, MapPin, ShieldCheck } from "lucide-react";
 import heroImage from "@/assets/hero.jpg";
+import exteriorAsset from "@/assets/clinic/exterior.jpeg.asset.json";
+import receptionAsset from "@/assets/clinic/reception.jpeg.asset.json";
+import dentalRoomAsset from "@/assets/clinic/dental-room.jpeg.asset.json";
+import servicesAsset from "@/assets/clinic/services.jpeg.asset.json";
+import parkingAsset from "@/assets/clinic/parking.jpeg.asset.json";
 import { SiteLayout } from "@/components/SiteLayout";
 import { ContactForm } from "@/components/ContactForm";
 import { supabase } from "@/integrations/supabase/client";
@@ -26,6 +31,14 @@ const KEYWORDS = [
   "bellavitae clinic",
   "bellavitaemedicalclinic kigali",
 ].join(", ");
+
+const GALLERY = [
+  { src: exteriorAsset.url, alt: "Bella Vitae Medical Clinic building entrance in Kigali", wide: true },
+  { src: receptionAsset.url, alt: "Bella Vitae Medical Clinic reception desk" },
+  { src: dentalRoomAsset.url, alt: "Dental treatment room at Bella Vitae Medical Clinic" },
+  { src: servicesAsset.url, alt: "Bella Vitae Clinic services poster: consultation, laboratory, echography, dental" },
+  { src: parkingAsset.url, alt: "Parking area in front of Bella Vitae Medical Clinic" },
+];
 
 const DOCTORS = [
   { name: "Antoine HABIYAMBERE", specialty: "General practitioner", phone: "+250784259304" },
