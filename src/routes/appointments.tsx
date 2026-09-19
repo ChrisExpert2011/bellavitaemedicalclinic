@@ -77,22 +77,37 @@ function AppointmentsPage() {
       toast.error("Please choose a doctor");
       return;
     }
+    if (!form.requested_date || form.requested_date < todayISO) {
+      toast.error("Please choose today or a future date");
+      return;
+    }
+    if (form.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
     setBusy(true);
     try {
-      const { data, error } = await supabase.rpc("book_appointment", {
-        _patient_name: form.patient_name.trim(),
-        _phone: form.phone.trim(),
-        _insurance: form.insurance,
-        _insurance_card: form.insurance_card.trim(),
-        _doctor: form.doctor,
-        _requested_date: form.requested_date,
-        _requested_time: form.requested_time,
-        _reason: form.reason.trim(),
+      const result = await book({
+        data: {
+          patient_name: form.patient_name.trim(),
+          phone: form.phone.trim(),
+          email: form.email.trim(),
+          insurance: form.insurance,
+          insurance_card: form.insurance_card.trim(),
+          doctor: form.doctor,
+          requested_date: form.requested_date,
+          requested_time: form.requested_time,
+          reason: form.reason.trim(),
+        },
       });
-      if (error) throw error;
-      setCode(data as string);
+      setCode(result.code);
       toast.success("Appointment requested!");
-      void notifyDoctor({ data: { code: data as string } }).catch(() => undefined);
+      if (!result.notified) {
+        toast.warning(
+          "Your appointment is saved, but the clinic notification email could not be delivered yet.",
+        );
+      }
+      void notifyDoctor({ data: { code: result.code } }).catch(() => undefined);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Could not book the appointment");
     } finally {
