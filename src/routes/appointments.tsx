@@ -161,6 +161,12 @@ function AppointmentsPage() {
           >
             <Field label="Patient full name" value={form.patient_name} onChange={(v) => set("patient_name", v)} required />
             <Field label="Phone number" value={form.phone} onChange={(v) => set("phone", v)} required />
+            <Field
+              label="Email (optional — we send your code here)"
+              type="email"
+              value={form.email}
+              onChange={(v) => set("email", v)}
+            />
             <label className="block text-sm">
               <span className="mb-1 block font-medium">Insurance</span>
               <select
@@ -210,6 +216,7 @@ function AppointmentsPage() {
               type="date"
               value={form.requested_date}
               onChange={(v) => set("requested_date", v)}
+              min={todayISO}
               required
             />
             <label className="block text-sm sm:col-span-2">
