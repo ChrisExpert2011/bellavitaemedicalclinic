@@ -1,0 +1,1 @@
+DELETE FROM public.appointments WHERE code = 'BV-0D38B7';
