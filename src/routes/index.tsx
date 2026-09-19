@@ -247,6 +247,30 @@ function Index() {
       </section>
 
       <section className="mx-auto max-w-6xl px-4 py-14">
+        <h2 className="text-3xl font-bold text-primary">Inside our clinic</h2>
+        <p className="mt-2 max-w-2xl text-muted-foreground">
+          A look at our entrance, reception, treatment rooms and the services we offer every day.
+        </p>
+        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {GALLERY.map((g) => (
+            <figure
+              key={g.src}
+              className={`overflow-hidden rounded-2xl border border-border bg-card shadow-sm ${
+                g.wide ? "sm:col-span-2" : ""
+              }`}
+            >
+              <img
+                src={g.src}
+                alt={g.alt}
+                loading="lazy"
+                className="h-60 w-full object-cover transition-transform duration-300 hover:scale-105 sm:h-72"
+              />
+            </figure>
+          ))}
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-4 py-14">
         <h2 className="text-3xl font-bold text-primary">Our team</h2>
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {(team ?? []).map((m) => (
