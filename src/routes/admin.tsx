@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { createWorker } from "@/lib/admin.functions";
 import { listWorkers, deleteWorker } from "@/lib/staff.functions";
+import { sendTestNotification } from "@/lib/status.functions";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -739,6 +740,7 @@ function TeamTab() {
 
 function SettingsTab() {
   const qc = useQueryClient();
+  const sendTest = useServerFn(sendTestNotification);
   const [email, setEmail] = useState("");
   const [loaded, setLoaded] = useState(false);
 
@@ -785,12 +787,28 @@ function SettingsTab() {
         appointment code.
       </p>
       <Field label="Notification email" type="email" value={email} onChange={setEmail} />
-      <button
-        onClick={save}
-        className="rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground"
-      >
-        Save
-      </button>
+      <div className="flex flex-wrap gap-2">
+        <button
+          onClick={save}
+          className="rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground"
+        >
+          Save
+        </button>
+        <button
+          onClick={async () => {
+            try {
+              const r = await sendTest();
+              if (r.sent) toast.success("Test email sent — check the inbox");
+              else toast.warning(r.error ?? "Test email could not be sent");
+            } catch (err) {
+              toast.error(err instanceof Error ? err.message : "Could not send test email");
+            }
+          }}
+          className="rounded-md border border-border px-4 py-2 text-sm font-semibold"
+        >
+          Send test email
+        </button>
+      </div>
     </div>
   );
 }

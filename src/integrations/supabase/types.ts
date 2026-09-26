@@ -475,6 +475,16 @@ export type Database = {
           requested_time: string
         }[]
       }
+      get_appointment_status: {
+        Args: { _code: string }
+        Returns: {
+          code: string
+          doctor: string
+          requested_date: string
+          requested_time: string
+          status: string
+        }[]
+      }
       get_appointments_by_token: {
         Args: { _token: string }
         Returns: {
