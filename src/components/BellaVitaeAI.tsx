@@ -114,7 +114,15 @@ export function BellaVitaeAI() {
                   <Link to="/appointments" onClick={() => setOpen(false)} className="text-xs text-primary hover:underline">
                     Book an appointment
                   </Link>
-                  <PromptInputSubmit status={status} onStop={stop} />
+                  <PromptInputSubmit
+                    status={status}
+                    onClick={(e) => {
+                      if (busy) {
+                        e.preventDefault();
+                        void stop();
+                      }
+                    }}
+                  />
                 </PromptInputFooter>
               </PromptInput>
               <p className="mt-2 text-center text-[10px] text-muted-foreground">

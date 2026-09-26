@@ -135,11 +135,23 @@ function AppointmentsPage() {
         </p>
 
         {code ? (
-          <div className="mt-8 rounded-2xl border-2 border-accent bg-accent/10 p-6 text-center">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.94 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+            className="mt-8 rounded-2xl border-2 border-accent bg-accent/10 p-6 text-center"
+          >
             <p className="text-sm uppercase tracking-widest text-muted-foreground">
               Your appointment code
             </p>
-            <p className="mt-2 text-4xl font-bold tracking-widest text-primary">{code}</p>
+            <motion.p
+              initial={{ letterSpacing: "0.6em", opacity: 0 }}
+              animate={{ letterSpacing: "0.1em", opacity: 1 }}
+              transition={{ delay: 0.2, duration: 0.7 }}
+              className="mt-2 text-4xl font-bold text-primary"
+            >
+              {code}
+            </motion.p>
             <p className="mt-3 text-sm text-muted-foreground">
               Keep this code. Present it at the reception on{" "}
               <strong>
@@ -238,31 +250,8 @@ function AppointmentsPage() {
           </form>
         )}
 
-        <div className="mt-10 rounded-2xl border border-border bg-card p-6">
-          <h2 className="text-lg font-semibold">Check an appointment</h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Signed-in patients and staff can look up an appointment by its code.
-          </p>
-          <div className="mt-3 flex gap-2">
-            <input
-              value={lookup}
-              onChange={(e) => setLookup(e.target.value)}
-              placeholder="BV-XXXXXX"
-              className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm"
-            />
-            <button onClick={search} className="rounded-md bg-secondary px-4 py-2 text-sm font-medium">
-              Search
-            </button>
-          </div>
-          {found ? (
-            <div className="mt-4 rounded-lg bg-secondary/60 p-4 text-sm">
-              <p><strong>{String(found['patient_name'])}</strong> — {String(found['doctor'])}</p>
-              <p>
-                {String(found['requested_date'])} at {String(found['requested_time'])} · status:{" "}
-                {String(found['status'])}
-              </p>
-            </div>
-          ) : null}
+        <div className="mt-10">
+          <AppointmentStatusLookup />
         </div>
       </div>
     </SiteLayout>

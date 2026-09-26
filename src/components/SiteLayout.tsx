@@ -4,6 +4,7 @@ import { useState, type ReactNode } from "react";
 import logo from "@/assets/logo.png";
 import { useAuth } from "@/hooks/useAuth";
 import { CLINIC_ADDRESS, CLINIC_NAME } from "@/lib/clinic";
+import { BellaVitaeAI } from "@/components/BellaVitaeAI";
 
 const navLinks = [
   { to: "/", label: "Home" },
@@ -155,6 +156,7 @@ export function SiteLayout({ children }: { children: ReactNode }) {
           © {new Date().getFullYear()} {CLINIC_NAME}. Website by Chris Expert — mucyochristhecla@gmail.com
         </div>
       </footer>
+      <BellaVitaeAI />
     </div>
   );
 }
