@@ -181,6 +181,19 @@ function Index() {
     },
   });
 
+  const { data: updates } = useQuery({
+    queryKey: ["home_updates"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("posts")
+        .select("id, title, created_at")
+        .eq("published", true)
+        .order("created_at", { ascending: false })
+        .limit(3);
+      return data ?? [];
+    },
+  });
+
   return (
     <SiteLayout>
       <section className="relative overflow-hidden">
@@ -241,6 +254,25 @@ function Index() {
           </Reveal>
         ))}
       </section>
+
+      {updates && updates.length > 0 ? (
+        <section className="mx-auto max-w-6xl px-4 pb-10">
+          <Reveal className="rounded-2xl border border-accent/40 bg-accent/10 p-5">
+            <div className="flex items-center justify-between">
+              <h2 className="text-sm font-semibold uppercase tracking-widest text-primary">Latest updates</h2>
+              <Link to="/news" className="text-sm text-primary hover:underline">All news →</Link>
+            </div>
+            <ul className="mt-3 grid gap-3 sm:grid-cols-3">
+              {updates.map((u) => (
+                <li key={u.id} className="rounded-xl bg-card p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+                  <p className="text-xs text-muted-foreground">{new Date(u.created_at).toLocaleDateString()}</p>
+                  <p className="mt-1 font-medium">{u.title}</p>
+                </li>
+              ))}
+            </ul>
+          </Reveal>
+        </section>
+      ) : null}
 
       <section className="bg-secondary/50 py-14">
         <div className="mx-auto max-w-6xl px-4">
