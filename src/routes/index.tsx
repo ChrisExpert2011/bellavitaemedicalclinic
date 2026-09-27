@@ -8,6 +8,9 @@ import dentalRoomAsset from "@/assets/clinic/dental-room.jpeg.asset.json";
 import servicesAsset from "@/assets/clinic/services.jpeg.asset.json";
 import parkingAsset from "@/assets/clinic/parking.jpeg.asset.json";
 import { SiteLayout } from "@/components/SiteLayout";
+import { Reveal } from "@/components/Reveal";
+import { AppointmentStatusLookup } from "@/components/AppointmentStatusLookup";
+import { motion } from "motion/react";
 import { ContactForm } from "@/components/ContactForm";
 import { supabase } from "@/integrations/supabase/client";
 import { useInsurances } from "@/hooks/useInsurances";
@@ -178,6 +181,19 @@ function Index() {
     },
   });
 
+  const { data: updates } = useQuery({
+    queryKey: ["home_updates"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("posts")
+        .select("id, title, created_at")
+        .eq("published", true)
+        .order("created_at", { ascending: false })
+        .limit(3);
+      return data ?? [];
+    },
+  });
+
   return (
     <SiteLayout>
       <section className="relative overflow-hidden">
@@ -186,11 +202,12 @@ function Index() {
           alt="Nurse welcoming a patient at Bella Vitae Medical Clinic in Kigali"
           width={1600}
           height={1000}
-          className="h-[420px] w-full object-cover sm:h-[520px]"
+          className="h-[420px] w-full animate-[heroZoom_18s_ease-out_forwards] object-cover sm:h-[520px]"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-primary/90 via-primary/70 to-primary/20" />
         <div className="absolute inset-0">
           <div className="mx-auto flex h-full max-w-6xl flex-col justify-center px-4 text-primary-foreground">
+            <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}>
             <p className="text-sm uppercase tracking-[0.2em] opacity-90">Kigali · KN 5 Rd</p>
             <h1 className="mt-3 max-w-2xl text-4xl font-bold leading-tight sm:text-5xl">
               {CLINIC_NAME}
@@ -214,8 +231,13 @@ function Index() {
                 Call +250 788 275 617
               </a>
             </div>
+            </motion.div>
           </div>
         </div>
+      </section>
+
+      <section className="mx-auto -mt-10 max-w-3xl px-4 relative z-10">
+        <Reveal><AppointmentStatusLookup /></Reveal>
       </section>
 
       <section className="mx-auto grid max-w-6xl gap-4 px-4 py-10 sm:grid-cols-2 lg:grid-cols-4">
@@ -224,14 +246,33 @@ function Index() {
           { icon: ShieldCheck, title: "7 insurances", text: "RSSB, MMI, UAP, RADIANT & more" },
           { icon: Languages, title: "Kinyarwanda & English", text: "Care in your language" },
           { icon: CalendarCheck, title: "Online booking", text: "Get an appointment code instantly" },
-        ].map((f) => (
-          <div key={f.title} className="rounded-xl border border-border bg-card p-5 shadow-sm">
+        ].map((f, i) => (
+          <Reveal key={f.title} delay={i * 0.08} className="rounded-xl border border-border bg-card p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
             <f.icon className="h-6 w-6 text-primary" />
             <h3 className="mt-3 font-semibold">{f.title}</h3>
             <p className="mt-1 text-sm text-muted-foreground">{f.text}</p>
-          </div>
+          </Reveal>
         ))}
       </section>
+
+      {updates && updates.length > 0 ? (
+        <section className="mx-auto max-w-6xl px-4 pb-10">
+          <Reveal className="rounded-2xl border border-accent/40 bg-accent/10 p-5">
+            <div className="flex items-center justify-between">
+              <h2 className="text-sm font-semibold uppercase tracking-widest text-primary">Latest updates</h2>
+              <Link to="/news" className="text-sm text-primary hover:underline">All news →</Link>
+            </div>
+            <ul className="mt-3 grid gap-3 sm:grid-cols-3">
+              {updates.map((u) => (
+                <li key={u.id} className="rounded-xl bg-card p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+                  <p className="text-xs text-muted-foreground">{new Date(u.created_at).toLocaleDateString()}</p>
+                  <p className="mt-1 font-medium">{u.title}</p>
+                </li>
+              ))}
+            </ul>
+          </Reveal>
+        </section>
+      ) : null}
 
       <section className="bg-secondary/50 py-14">
         <div className="mx-auto max-w-6xl px-4">
@@ -252,7 +293,8 @@ function Index() {
           A look at our entrance, reception, treatment rooms and the services we offer every day.
         </p>
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {GALLERY.map((g) => (
+          {GALLERY.map((g, i) => (
+            <Reveal key={g.src} delay={i * 0.06} className={g.wide ? "sm:col-span-2" : ""}>
             <figure
               key={g.src}
               className={`overflow-hidden rounded-2xl border border-border bg-card shadow-sm ${
@@ -266,6 +308,7 @@ function Index() {
                 className="h-60 w-full object-cover transition-transform duration-300 hover:scale-105 sm:h-72"
               />
             </figure>
+            </Reveal>
           ))}
         </div>
       </section>
@@ -273,8 +316,8 @@ function Index() {
       <section className="mx-auto max-w-6xl px-4 py-14">
         <h2 className="text-3xl font-bold text-primary">Our team</h2>
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {(team ?? []).map((m) => (
-            <div key={m.id} className="rounded-xl border border-border bg-card p-5 shadow-sm">
+          {(team ?? []).map((m, i) => (
+            <Reveal key={m.id} delay={i * 0.06} className="rounded-xl border border-border bg-card p-5 shadow-sm transition hover:-translate-y-1 hover:border-primary/40 hover:shadow-lg">
               <p className="text-xs font-semibold uppercase tracking-wide text-accent-foreground/80">
                 {m.specialty}
               </p>
@@ -282,7 +325,7 @@ function Index() {
               {m.phones ? (
                 <p className="mt-1 text-sm text-muted-foreground">{m.phones}</p>
               ) : null}
-            </div>
+            </Reveal>
           ))}
         </div>
       </section>

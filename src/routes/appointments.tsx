@@ -10,6 +10,8 @@ import { useInsurances } from "@/hooks/useInsurances";
 import { notifyDoctorOfBooking } from "@/lib/notify.functions";
 import { createBooking } from "@/lib/booking.functions";
 import { INSURANCES, TIME_SLOTS } from "@/lib/clinic";
+import { motion } from "motion/react";
+import { AppointmentStatusLookup } from "@/components/AppointmentStatusLookup";
 
 export const Route = createFileRoute("/appointments")({
   head: () => ({
@@ -165,7 +167,7 @@ function AppointmentsPage() {
             >
               Book another appointment
             </button>
-          </div>
+          </motion.div>
         ) : (
           <form
             onSubmit={submit}
