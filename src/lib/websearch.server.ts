@@ -4,8 +4,7 @@ const strip = (s: string) =>
   s.replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&#x27;|&#39;/g, "'")
     .replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/\s+/g, " ").trim();
 
-/** Free, keyless web search via DuckDuckGo Lite. Returns [] on any failure. */
-export async function webSearch(query: string, limit = 5): Promise<SearchHit[]> {
+async function ddg(query: string, limit = 5): Promise<SearchHit[]> {
   const q = query.trim().slice(0, 300);
   if (!q) return [];
   try {
@@ -27,4 +26,27 @@ export async function webSearch(query: string, limit = 5): Promise<SearchHit[]> 
   } catch {
     return [];
   }
+}
+
+async function wikipedia(q: string, limit: number): Promise<SearchHit[]> {
+  try {
+    const url = `https://en.wikipedia.org/w/api.php?action=query&list=search&format=json&srlimit=${limit}&srsearch=${encodeURIComponent(q)}`;
+    const res = await fetch(url, { headers: { "user-agent": "BellaVitaeAI/1.0" }, signal: AbortSignal.timeout(8000) });
+    if (!res.ok) return [];
+    const json = (await res.json()) as { query?: { search?: { title: string; snippet: string }[] } };
+    return (json.query?.search ?? []).map((r) => ({
+      title: r.title,
+      url: `https://en.wikipedia.org/wiki/${encodeURIComponent(r.title.replace(/ /g, "_"))}`,
+      snippet: strip(r.snippet),
+    }));
+  } catch {
+    return [];
+  }
+}
+
+/** Free, keyless web search: DuckDuckGo Lite first, Wikipedia as fallback. Returns [] on failure. */
+export async function webSearch(query: string, limit = 5): Promise<SearchHit[]> {
+  const hits = await ddg(query, limit);
+  if (hits.length) return hits;
+  return wikipedia(query.trim().slice(0, 300), limit);
 }
