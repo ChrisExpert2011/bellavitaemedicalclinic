@@ -28,7 +28,8 @@ function CommunityPage() {
   const [message, setMessage] = useState("");
 
   const { data: posts } = useQuery({
-    queryKey: ["community_posts"],
+    queryKey: ["community_posts", user?.id ?? null],
+    enabled: !!user,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("community_posts")
@@ -97,7 +98,7 @@ function CommunityPage() {
             <Link to="/auth" className="font-semibold text-primary hover:underline">
               Sign in
             </Link>{" "}
-            to join the conversation.
+            to read and join the conversation.
           </p>
         )}
 
